@@ -1,4 +1,4 @@
-# dell-fan-ctl
+# Dell fan controller for TrueNAS
 A work in progress for controlling Dell PowerEdge fan noise
 
 ## What's the fan algorithm
