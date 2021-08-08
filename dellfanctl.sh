@@ -26,11 +26,17 @@ if [ ${TEMPERATURE} -gt ${MAXTEMP} ]
     ctrl "enable"
 
     NEWFANSPEED=$(calc-fanspeed ${TEMPERATURE})
-    echo "Action: New fan speed: ${NEWFANSPEED}"
-    set-fanspeed ${NEWFANSPEED}
 
-    echo "Action: Checking new fan speed."
-    sleep 3
-    POSTFANSPEED=$(get-fanspeed)
-    echo "Info: New fan speed ${POSTFANSPEED}."
+    if [ ${NEWFANSPEED} ]
+      then
+        echo "Action: New fan speed: ${NEWFANSPEED}"
+        set-fanspeed ${NEWFANSPEED}
+        echo "Action: Checking new fan speed."
+        sleep 3
+        POSTFANSPEED=$(get-fanspeed)
+        echo "Info: New fan speed ${POSTFANSPEED}."
+      else
+        echo "Error: Something went wrong getting a new fan speed".
+    fi
+    
 fi

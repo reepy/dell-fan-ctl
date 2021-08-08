@@ -30,7 +30,7 @@ function get-fanspeed {
 function set-fanspeed {
   # param: % (which will be converted to hex)
 
-  ipmi "raw 0x30 0x30 0x02 0xff $(([##16]${1}))"
+  ipmi "raw 0x30 0x30 0x02 0xff 0x$(([##16]${1}))"
 
   # @todo work out whether this was successful or not
 
@@ -50,7 +50,8 @@ function calc-fanspeed {
 
   CURRTEMP=${1}
 
-  NEWSPEED=$(bc <<<"scale=2; ${MAXSPEED}-(${MINSPEED}/(${MINTEMP}/(${CURRTEMP}-${MINTEMP})))")
+  NEWSPEED=$(bc <<<"scale=2; ${MAXSPEED} - ( ${MINSPEED} / ( ${MINTEMP} / ( ${CURRTEMP} - ${MINTEMP} + 1 ) + 1 ) )")
+  # @todo work out why we're getting 'dc: divide by zero' and remove the +1s
 
   WITHINMIN=$(bc <<< "${NEWSPEED} < ${MAXSPEED}")
   WITHINMAX=$(bc <<< "${NEWSPEED} > ${MINSPEED}")
@@ -58,7 +59,7 @@ function calc-fanspeed {
 
   if [ ${WITHINMIN} ] || [ ${WITHINMAX} ] && [ ${ISNUMBER} ]
     then
-      printf "%0.2f\n" ${NEWSPEED}
+      printf "%u\n" ${NEWSPEED}
     else
       echo "Something went wrong"
   fi
