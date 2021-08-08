@@ -1,15 +1,15 @@
 # Dell fan controller for TrueNAS
-A work in progress for controlling Dell PowerEdge fan noise
+A work in progress for controlling Dell PowerEdge fan noise on TrueNAS.
 
 ## What's the fan algorithm
 
-Rather than hardcoded increments, use a curve based on a temperature range and acceptable fan speed.
+Rather than hardcoded increments, use a ratio based on a temperature range and acceptable fan speed.
 
 ## How to install it
 
-1. You'll need a server running Linux or some other flavour of Unix somewhere on your network. This is setup for TrueNAS Core.
+1. You'll need a TrueNAS server. It will also work on other flavours, but it assumes zsh and TrueNAS.
 1. Enable IMPI control and setup a user in iDrac.
-1. Clone this repo somewhere.
+1. Clone this repo to a pool/dataset.
 1. Update `settings.sh`.
 1. Run `dellfanctl.sh` via cron every 30 seconds `` @todo fill this out
 
