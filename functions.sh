@@ -2,9 +2,7 @@
 
 function ipmi {
   # param: ipmi string
-
-  echo ipmitool -I lanplus -H IMPIHOST -U IMPIUSER -P IMPIPASS ${1}
-
+  ipmitool -I lanplus -H ${IPMIHOST} -U ${IPMIUSER} -P ${IPMIPASS} $(printf "%s" "${@}")
 }
 
 function ctrl {
@@ -22,13 +20,11 @@ function ctrl {
 }
 
 function get-temperature {
-  ipmi "sdr type Temperature"
-  # @todo get just the temperature as a string
+  ipmi "sdr get ${TEMPCPUID}" | grep "Sensor Reading" | cut -d ':' -f 2 | cut -d ' ' -f 2
 }
 
 function get-fanspeed {
-  ipmi "sensor get ${FAN}"
-  # @todo get just the speed as a string
+  ipmi "sensor get ${FAN}" | grep "Sensor Reading" | cut -d ':' -f 2 | cut -d ' ' -f 2
 }
 
 function set-fanspeed {
@@ -41,22 +37,26 @@ function set-fanspeed {
 }
 
 function calc-isnumber {
-  case ${1#[-+]} in
-    ''|.|*[!0-9.]*|*.*.*) return 1;
-    ;
-  esac
+  if [[ ${1} =~ ^[+-]?([0-9]+([.][0-9]*)?|\.[0-9]+)$ ]]
+    then
+      echo 1
+    else
+      echo 0
+  fi
 }
 
 function calc-fanspeed {
   # param: current temp
 
-  CURRTEMP = ${1}
+  CURRTEMP=${1}
 
-  NEWSPEED = ${MAXSPEED} - ( ${MINSPEED} / ( ${MINTEMP} / ( ${CURRTEMP} - ${MINTEMP} ) ) )
+  NEWSPEED=$(bc <<<"scale=2; ${MAXSPEED}-(${MINSPEED}/(${MINTEMP}/(${CURRTEMP}-${MINTEMP})))")
 
+  WITHINMIN=$(bc <<< "${NEWSPEED} < ${MAXSPEED}")
+  WITHINMAX=$(bc <<< "${NEWSPEED} > ${MINSPEED}")
   ISNUMBER=$(calc-isnumber ${NEWSPEED})
 
-  if [ ${NEWSPEED} -gt ${MINSPEED} ] || [ ${NEWSPEED} -lt ${MAXSPEED} ] && [ ${ISNUMBER} ]
+  if [ ${WITHINMIN} ] || [ ${WITHINMAX} ] && [ ${ISNUMBER} ]
     then
       printf "%0.2f\n" ${NEWSPEED}
     else
