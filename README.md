@@ -8,3 +8,4 @@ A work in progress for controlling Dell PowerEdge fan noise
 * https://gist.github.com/kaysond/35f63c32a0a11daa9e0a53a9c200c1a4
 * https://github.com/White-Raven/PowerEdge-shutup1
 * http://richgannon.net/projects/dellfanspeed/r710_fan_controller.sh
+* https://github.com/spacelama/R710-Fan-Control
